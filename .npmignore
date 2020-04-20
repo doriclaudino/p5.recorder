@@ -1,0 +1,6 @@
+coverage
+test
+.babelrc 
+.eslintrc
+.prettierrc
+jest.config.js

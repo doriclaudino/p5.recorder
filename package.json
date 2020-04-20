@@ -1,8 +1,9 @@
 {
-  "name": "p5.record",
-  "version": "1.0.0",
+  "name": "p5.recorder",
+  "version": "0.0.1",
   "description": "record p5js canvas as webm, mp4, gif",
-  "main": "dist/index.js",
+  "main": "dist/p5.recorder.js",
+  "module": "dist/p5.recorder.js",
   "repository": "https://github.com/doriclaudino/p5.record.git",
   "author": "doriclaudino <dori.claudino@gmail.com>",
   "license": "MIT",
