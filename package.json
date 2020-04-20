@@ -1,0 +1,21 @@
+{
+  "name": "p5.record",
+  "version": "1.0.0",
+  "description": "record p5js canvas as webm, mp4, gif",
+  "main": "dist/index.js",
+  "repository": "https://github.com/doriclaudino/p5.record.git",
+  "author": "doriclaudino <dori.claudino@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "babel-jest": "^25.4.0",
+    "jest": "^25.4.0",
+    "jest-environment-jsdom-sixteen": "^1.0.3",
+    "webpack": "^4.42.1"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}
