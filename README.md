@@ -8,8 +8,8 @@
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/doriclaudino/p5.recorder/issues)
 
-
 ### Install (CDN)
+
 ```html
 <!-- option one jsdelivr-->
 <script src="https://cdn.jsdelivr.net/npm/p5.recorder@0.0.2/dist/p5.recorder.js"></script>
@@ -23,7 +23,6 @@
 <script src="../p5.recorder.js"></script>
 ```
 
-
 ### Install (NPM)
 
 ```bash
@@ -32,9 +31,9 @@ or
 yarn install p5.drawer
 ```
 
+basic example (javascript):
 
-basic example:
-```javascript 
+```javascript
 //let rec = new p5.Recorder([output = "p5.recorder.canvas.webm"], [saveAtEnd = true]);
 let rec = new p5.Recorder(outputName, saveAtEnd);
 rec.start();
@@ -44,9 +43,20 @@ rec.stop();
 //make sure you call rec.download()
 ```
 
+basic example (node):
+
+```javascript
+import Recorder from "p5.recorder";
+let rec = new Recorder();
+rec.start();
+rec.stop();
+//rec.download();
+```
 
 ## still in development
- only support .webm for now
+
+only support .webm for now
 
 ## for future reference
+
 https://editor.p5js.org/doriclaudino/sketches/LgLw5UaBr
