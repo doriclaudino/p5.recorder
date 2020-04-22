@@ -1,8 +1,8 @@
 /**
- * p5.recorder 
+ * Copyright p5.recorder
  * v0.0.2
  * by doriclaudino <dori.claudino@gmail.com>
- * 4/21/2020
+ * 4/22/2020
  */
 
 (function (global, factory) {
@@ -18,28 +18,14 @@
 	}
 
 	var download = createCommonjsModule(function (module, exports) {
-	//download.js v4.2, by dandavis; 2008-2016. [MIT] see http://danml.com/download.html for tests/usage
-	// v1 landed a FF+Chrome compat way of downloading strings to local un-named files, upgraded to use a hidden frame and optional mime
-	// v2 added named files via a[download], msSaveBlob, IE (10+) support, and window.URL support for larger+faster saves than dataURLs
-	// v3 added dataURL and Blob Input, bind-toggle arity, and legacy dataURL fallback was improved with force-download mime and base64 support. 3.1 improved safari handling.
-	// v4 adds AMD/UMD, commonJS, and plain browser support
-	// v4.1 adds url download capability via solo URL argument (same domain/CORS only)
-	// v4.2 adds semantic variable names, long (over 2MB) dataURL support, and hidden by default temp anchors
-	// https://github.com/rndme/download
-
 	(function (root, factory) {
 		{
-			// Node. Does not work with strict CommonJS, but
-			// only CommonJS-like environments that support module.exports,
-			// like Node.
 			module.exports = factory();
 		}
 	}(commonjsGlobal, function () {
-
 		return function download(data, strFileName, strMimeType) {
-
-			var self = window, // this script is only for browsers anyway...
-				defaultMime = "application/octet-stream", // this default mime also triggers iframe downloads
+			var self = window,
+				defaultMime = "application/octet-stream",
 				mimeType = strMimeType || defaultMime,
 				payload = data,
 				url = !strFileName && !strMimeType && payload,
@@ -50,54 +36,44 @@
 				blob,
 				reader;
 				myBlob= myBlob.call ? myBlob.bind(self) : Blob ;
-		  
-			if(String(this)==="true"){ //reverse arguments, allowing download.bind(true, "text/xml", "export.xml") to act as a callback
+			if(String(this)==="true"){
 				payload=[payload, mimeType];
 				mimeType=payload[0];
 				payload=payload[1];
 			}
-
-
-			if(url && url.length< 2048){ // if no filename and no mime, assume a url was passed as the only argument
+			if(url && url.length< 2048){
 				fileName = url.split("/").pop().split("?")[0];
-				anchor.href = url; // assign href prop to temp anchor
-			  	if(anchor.href.indexOf(url) !== -1){ // if the browser determines that it's a potentially valid url path:
+				anchor.href = url;
+			  	if(anchor.href.indexOf(url) !== -1){
 	        		var ajax=new XMLHttpRequest();
 	        		ajax.open( "GET", url, true);
 	        		ajax.responseType = 'blob';
-	        		ajax.onload= function(e){ 
+	        		ajax.onload= function(e){
 					  download(e.target.response, fileName, defaultMime);
 					};
-	        		setTimeout(function(){ ajax.send();}, 0); // allows setting custom ajax headers using the return:
+	        		setTimeout(function(){ ajax.send();}, 0);
 				    return ajax;
-				} // end if valid url?
-			} // end if url?
-
-
-			//go ahead and download dataURLs right away
+				}
+			}
 			if(/^data:([\w+-]+\/[\w+.-]+)?[,;]/.test(payload)){
-			
 				if(payload.length > (1024*1024*1.999) && myBlob !== toString ){
 					payload=dataUrlToBlob(payload);
 					mimeType=payload.type || defaultMime;
-				}else {			
-					return navigator.msSaveBlob ?  // IE10 can't do a[download], only Blobs:
+				}else {
+					return navigator.msSaveBlob ?
 						navigator.msSaveBlob(dataUrlToBlob(payload), fileName) :
-						saver(payload) ; // everyone else can save dataURLs un-processed
+						saver(payload) ;
 				}
-				
-			}else {//not data url, is it a string with special needs?
-				if(/([\x80-\xff])/.test(payload)){			  
+			}else {
+				if(/([\x80-\xff])/.test(payload)){
 					var i=0, tempUiArr= new Uint8Array(payload.length), mx=tempUiArr.length;
 					for(i;i<mx;++i) tempUiArr[i]= payload.charCodeAt(i);
 				 	payload=new myBlob([tempUiArr], {type: mimeType});
-				}		  
+				}
 			}
 			blob = payload instanceof myBlob ?
 				payload :
 				new myBlob([payload], {type: mimeType}) ;
-
-
 			function dataUrlToBlob(strUrl) {
 				var parts= strUrl.split(/[:;,]/),
 				type= parts[1],
@@ -106,15 +82,11 @@
 				mx= binData.length,
 				i= 0,
 				uiArr= new Uint8Array(mx);
-
 				for(i;i<mx;++i) uiArr[i]= binData.charCodeAt(i);
-
 				return new myBlob([uiArr], {type: type});
 			 }
-
 			function saver(url, winMode){
-
-				if ('download' in anchor) { //html5 A[download]
+				if ('download' in anchor) {
 					anchor.href = url;
 					anchor.setAttribute("download", fileName);
 					anchor.className = "download-js-link";
@@ -128,39 +100,27 @@
 					}, 66);
 					return true;
 				}
-
-				// handle non-a[download] safari as best we can:
 				if(/(Version)\/(\d+)\.(\d+)(?:\.(\d+))?.*Safari\//.test(navigator.userAgent)) {
 					if(/^data:/.test(url))	url="data:"+url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
-					if(!window.open(url)){ // popup blocked, offer direct download:
+					if(!window.open(url)){
 						if(confirm("Displaying New Document\n\nUse Save As... to download, then click back to return to this page.")){ location.href=url; }
 					}
 					return true;
 				}
-
-				//do iframe dataURL download (old ch+FF):
 				var f = document.createElement("iframe");
 				document.body.appendChild(f);
-
-				if(!winMode && /^data:/.test(url)){ // force a mime that will download:
+				if(!winMode && /^data:/.test(url)){
 					url="data:"+url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
 				}
 				f.src=url;
 				setTimeout(function(){ document.body.removeChild(f); }, 333);
-
-			}//end saver
-
-
-
-
-			if (navigator.msSaveBlob) { // IE10+ : (has Blob, but not a[download] or URL)
+			}
+			if (navigator.msSaveBlob) {
 				return navigator.msSaveBlob(blob, fileName);
 			}
-
-			if(self.URL){ // simple fast and modern way using Blob and URL:
+			if(self.URL){
 				saver(self.URL.createObjectURL(blob), true);
 			}else {
-				// handle non-Blob()+non-URL browsers:
 				if(typeof blob === "string" || blob.constructor===toString ){
 					try{
 						return saver( "data:" +  mimeType   + ";base64,"  +  self.btoa(blob)  );
@@ -168,8 +128,6 @@
 						return saver( "data:" +  mimeType   + "," + encodeURIComponent(blob)  );
 					}
 				}
-
-				// Blob but not URL support:
 				reader=new FileReader();
 				reader.onload=function(e){
 					saver(this.result);
@@ -177,16 +135,14 @@
 				reader.readAsDataURL(blob);
 			}
 			return true;
-		}; /* end download() */
+		};
 	}));
 	});
 
-	/**
-	 * version only save webm
-	 */
-
 	class Recorder {
-	  constructor(output = "p5.recorder.canvas.webm", saveAtEnd = true) {
+	  constructor() {
+	    var output = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "p5.recorder.canvas.webm";
+	    var saveAtEnd = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 	    this._isRecording = false;
 	    this._targetFps = 60;
 	    this._initialTime;
@@ -197,36 +153,27 @@
 	    this._saveAtEnd = saveAtEnd;
 	    this._canvas;
 	  }
-
 	  get currentBlob() {
 	    return new Blob(this._chunks);
 	  }
-
-	  start(canvas = document.querySelector("canvas"), outputName = this._outputName, extras = {}) {
-	    if (this._isRecording) throw new Error(`Stop first before start again`);
+	  start() {
+	    var canvas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document.querySelector("canvas");
+	    var outputName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this._outputName;
+	    if (this._isRecording) throw new Error("Stop first before start again");
 	    this._canvas = canvas;
 	    this._outputName = outputName;
-	    if (!this._canvas || !this._canvas.captureStream)
-	      throw new Error(`Can't find the canvas for start recording`);
-	    let stream = this._canvas.captureStream(this._targetFps);
-
-	    /**
-	     * https://developers.google.com/web/updates/2016/01/mediarecorder
-	     * we should check possible codecs
-	     */
+	    if (!this._canvas || !this._canvas.captureStream) throw new Error("Can't find the canvas for start recording");
+	    var stream = this._canvas.captureStream(this._targetFps);
 	    this._recorder = new MediaRecorder(stream);
 	    this._recorder.ondataavailable = e => {
 	      if (e.data.size) {
 	        this._chunks.push(e.data);
 	      }
 	    };
-
-	    //default for webm
 	    this._recorder.onstop = this._onMediaRecorderStop.bind(this);
 	    this._recorder.onstart = this._onMediaRecorderStart.bind(this);
 	    this._recorder.start();
 	  }
-
 	  _onMediaRecorderStart() {
 	    this._isRecording = true;
 	    this._initialRecordingTime = new Date();
@@ -235,43 +182,36 @@
 	    this._chunks = [];
 	    this._chunks.length = 0;
 	  }
-
 	  _onMediaRecorderStop() {
 	    this._isRecording = false;
 	    this._endRecordingTime = new Date();
 	    this._progress = 100;
 	    if (this._saveAtEnd) this.download();
 	  }
-
 	  download() {
 	    download(this.currentBlob, this._outputName, "video/webm");
 	  }
-
 	  stop() {
 	    this._recorder.stop();
 	  }
-
 	  get totalRecordedTime() {
 	    return this._endRecordingTime - this._initialRecordingTime;
 	  }
-
 	  get currentRecordingTime() {
 	    return new Date() - this._initialRecordingTime;
 	  }
-
 	  get currentRecordingFrames() {
 	    return this.currentRecordingTime * this.targetFps;
 	  }
-
 	  get targetFps() {
 	    return this._targetFps;
 	  }
-
 	  get totalRecordedFrames() {
-	    return (this.totalRecordedTime * this.targetFps) / 1000;
+	    return this.totalRecordedTime * this.targetFps / 1000;
 	  }
 	}
 
 	return Recorder;
 
 })));
+//# sourceMappingURL=p5.recorder.js.map

@@ -1,6 +1,7 @@
 const _download = require("downloadjs");
 /**
  * version only save webm
+ * doriclaudino
  */
 
 export default class Recorder {
@@ -16,6 +17,7 @@ export default class Recorder {
     this._canvas;
   }
 
+  //doriclaudino
   get currentBlob() {
     return new Blob(this._chunks);
   }
