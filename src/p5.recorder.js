@@ -1,20 +1,22 @@
 const _download = require("downloadjs");
-/**
- * version only save webm
- * doriclaudino
- */
 
 export default class Recorder {
-  constructor(output = "p5.recorder.canvas.webm", saveAtEnd = true) {
+  _isRecording;
+  _targetFps;
+  _initialTime;
+  _endTime;
+  _outputName;
+  _chunks;
+  _recorder;
+  _saveAfterStop;
+  _canvas;
+
+  constructor(output = "p5.recorder.canvas.webm", saveAfterStop = true) {
     this._isRecording = false;
     this._targetFps = 60;
-    this._initialTime;
-    this._endTime;
     this._outputName = output;
     this._chunks = [];
-    this._recorder;
-    this._saveAtEnd = saveAtEnd;
-    this._canvas;
+    this._saveAfterStop = saveAfterStop;
   }
 
   //doriclaudino
@@ -23,11 +25,12 @@ export default class Recorder {
   }
 
   start(canvas = document.querySelector("canvas"), outputName = this._outputName, extras = {}) {
-    if (this._isRecording) throw new Error(`Stop first before start again`);
+    if (this._isRecording) throw new Error("Stop first before start again");
     this._canvas = canvas;
     this._outputName = outputName;
+
     if (!this._canvas || !this._canvas.captureStream)
-      throw new Error(`Can't find the canvas for start recording`);
+      throw new Error("Can't find the canvas for start recording");
     let stream = this._canvas.captureStream(this._targetFps);
 
     /**
@@ -60,7 +63,7 @@ export default class Recorder {
     this._isRecording = false;
     this._endRecordingTime = new Date();
     this._progress = 100;
-    if (this._saveAtEnd) this.download();
+    if (this._saveAfterStop) this.download();
   }
 
   download() {
@@ -80,14 +83,10 @@ export default class Recorder {
   }
 
   get currentRecordingFrames() {
-    return this.currentRecordingTime * this.targetFps;
-  }
-
-  get targetFps() {
-    return this._targetFps;
+    return this.currentRecordingTime * this._targetFps;
   }
 
   get totalRecordedFrames() {
-    return (this.totalRecordedTime * this.targetFps) / 1000;
+    return (this.totalRecordedTime * this._targetFps) / 1000;
   }
 }

@@ -139,19 +139,39 @@
 	}));
 	});
 
+	function _defineProperty(obj, key, value) {
+	  if (key in obj) {
+	    Object.defineProperty(obj, key, {
+	      value: value,
+	      enumerable: true,
+	      configurable: true,
+	      writable: true
+	    });
+	  } else {
+	    obj[key] = value;
+	  }
+
+	  return obj;
+	}
+
 	class Recorder {
 	  constructor() {
 	    var output = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "p5.recorder.canvas.webm";
-	    var saveAtEnd = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+	    var saveAfterStop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+	    _defineProperty(this, "_isRecording", void 0);
+	    _defineProperty(this, "_targetFps", void 0);
+	    _defineProperty(this, "_initialTime", void 0);
+	    _defineProperty(this, "_endTime", void 0);
+	    _defineProperty(this, "_outputName", void 0);
+	    _defineProperty(this, "_chunks", void 0);
+	    _defineProperty(this, "_recorder", void 0);
+	    _defineProperty(this, "_saveAfterStop", void 0);
+	    _defineProperty(this, "_canvas", void 0);
 	    this._isRecording = false;
 	    this._targetFps = 60;
-	    this._initialTime;
-	    this._endTime;
 	    this._outputName = output;
 	    this._chunks = [];
-	    this._recorder;
-	    this._saveAtEnd = saveAtEnd;
-	    this._canvas;
+	    this._saveAfterStop = saveAfterStop;
 	  }
 	  get currentBlob() {
 	    return new Blob(this._chunks);
@@ -186,7 +206,7 @@
 	    this._isRecording = false;
 	    this._endRecordingTime = new Date();
 	    this._progress = 100;
-	    if (this._saveAtEnd) this.download();
+	    if (this._saveAfterStop) this.download();
 	  }
 	  download() {
 	    download(this.currentBlob, this._outputName, "video/webm");
@@ -201,13 +221,10 @@
 	    return new Date() - this._initialRecordingTime;
 	  }
 	  get currentRecordingFrames() {
-	    return this.currentRecordingTime * this.targetFps;
-	  }
-	  get targetFps() {
-	    return this._targetFps;
+	    return this.currentRecordingTime * this._targetFps;
 	  }
 	  get totalRecordedFrames() {
-	    return this.totalRecordedTime * this.targetFps / 1000;
+	    return this.totalRecordedTime * this._targetFps / 1000;
 	  }
 	}
 

@@ -4,10 +4,11 @@
       "@babel/preset-env",
       {
         "targets": {
-          "esmodules": true,
-          "node": "current"
+          "node": true,
+          "esmodules": true
         }
       }
     ]
-  ]
+  ],
+  "plugins": ["@babel/plugin-proposal-class-properties"]
 }
