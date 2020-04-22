@@ -1,17 +1,16 @@
-// const { createWorker } = require("@ffmpeg/ffmpeg");
-import * as _download from "downloadjs";
+const _download = require("downloadjs");
 /**
  * version only save webm
  */
 
-export class Recorder {
-  constructor(output = "p5.recorder.canvas.webm", saveAtEnd = false) {
+export default class Recorder {
+  constructor(output = "p5.recorder.canvas.webm", saveAtEnd = true) {
     this._isRecording = false;
     this._targetFps = 60;
     this._initialTime;
     this._endTime;
     this._outputName = output;
-    this._chunks;
+    this._chunks = [];
     this._recorder;
     this._saveAtEnd = saveAtEnd;
     this._canvas;
@@ -21,7 +20,7 @@ export class Recorder {
     return new Blob(this._chunks);
   }
 
-  start(canvas = document.querySelector("canvas"), outputName, extras = {}) {
+  start(canvas = document.querySelector("canvas"), outputName = this._outputName, extras = {}) {
     if (this._isRecording) throw new Error(`Stop first before start again`);
     this._canvas = canvas;
     this._outputName = outputName;
@@ -41,9 +40,9 @@ export class Recorder {
     };
 
     //default for webm
-    recorder.onstop = onRecorderStop;
-    recorder.onstart = this._onMediaRecorderStart;
-    recorder.start();
+    this._recorder.onstop = this._onMediaRecorderStop.bind(this);
+    this._recorder.onstart = this._onMediaRecorderStart.bind(this);
+    this._recorder.start();
   }
 
   _onMediaRecorderStart() {
@@ -59,7 +58,7 @@ export class Recorder {
     this._isRecording = false;
     this._endRecordingTime = new Date();
     this._progress = 100;
-    if (this._saveAtEnd) saveBlob();
+    if (this._saveAtEnd) this.download();
   }
 
   download() {
@@ -90,7 +89,3 @@ export class Recorder {
     return (this.totalRecordedTime * this.targetFps) / 1000;
   }
 }
-
-export default {
-  Recorder
-};

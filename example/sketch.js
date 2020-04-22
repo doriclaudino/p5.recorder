@@ -14,3 +14,4 @@ const s = sketch => {
 };
 
 const myp5 = new p5(s);
+rec = new p5.Recorder();
