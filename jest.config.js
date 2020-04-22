@@ -4,5 +4,7 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ["src/*.js"],
   coverageDirectory: "coverage",
-  testEnvironment: "jest-environment-jsdom-sixteen"
-}
+  testEnvironment: "jest-environment-jsdom-sixteen",
+  setupFiles: ["<rootDir>/scripts/setupFile.js"],
+  setupFilesAfterEnv: ["<rootDir>/scripts/jestAfterEnv.js"]
+};

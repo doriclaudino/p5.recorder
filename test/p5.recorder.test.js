@@ -1,24 +1,44 @@
-import { Recorder } from "../src/p5.recorder"
+import { Recorder } from "../src/p5.recorder";
 
 describe("smoke tests", () => {
-  var recoder = new Recorder("aaa", 1, 2)
-  beforeEach(() => {
-    recoder = new Recorder("aaa", 1, 2)
-  })
-  test("toString", () => {
-    expect(recoder.toString()).toBe("aaa12")
-  })
-  test("toHtml", () => {
-    recoder.toHtml()
-    expect(document.getElementById("divElement")).toBeTruthy()
-    expect(document.getElementById(`pElement-${1}`)).toBeTruthy()
-    expect(document.getElementById(`pElement-${2}`)).toBeTruthy()
-  })
-  test("toHtml extra param", () => {
-    let params = ["aaa", 1, 2, 3, 4, 5]
-    recoder = new Recorder(...params)
-    recoder.toHtml()
-    expect(document.getElementById("divElement")).toBeTruthy()
-    params.forEach(param => expect(document.getElementById(`pElement-${param}`)).toBeTruthy())
-  })
-})
+  var recoder = new Recorder("aaa", false);
+  test("can create an instance", () => {
+    expect(recoder).toBeTruthy();
+  });
+});
+
+describe("p5 available global", () => {
+  test("should p5 appear on global scope", () => {
+    expect(global.p5).toBeTruthy();
+  });
+
+  test("should p5 appear on window scope", () => {
+    expect(window.p5).toBeTruthy();
+  });
+
+  test("should created canvas", () => {
+    expect(document.getElementById("defaultCanvas0")).toBeTruthy();
+  });
+
+  test("should setup be true", () => {
+    expect(myp5).toBeTruthy();
+  });
+
+  test("should setup be true", () => {
+    expect(myp5._setupDone).toBeTruthy();
+  });
+
+  test("should setup be true", () => {
+    expect(myp5._setupDone).toBeTruthy();
+  });
+
+  test("can save canvas", done => {
+    /**
+     * fail
+     * object_url = get_URL().createObjectURL(blob);
+     * get_URL(...).createObjectURL is not a function
+     */
+    myp5.saveCanvas(myp5.canvas, "myCanvas", "jpg");
+    done();
+  });
+});
