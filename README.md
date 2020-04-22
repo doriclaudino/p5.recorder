@@ -47,3 +47,6 @@ rec.stop();
 
 ## still in development
  only support .webm for now
+
+## for future reference
+https://editor.p5js.org/doriclaudino/sketches/LgLw5UaBr
