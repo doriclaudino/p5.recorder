@@ -3,7 +3,6 @@ const _download = require("downloadjs");
 export default class Recorder {
   _isRecording;
   _targetFps;
-  _initialTime;
   _endTime;
   _outputName;
   _chunks;
@@ -29,8 +28,9 @@ export default class Recorder {
     this._canvas = canvas;
     this._outputName = outputName;
 
-    if (!this._canvas || !this._canvas.captureStream)
-      throw new Error("Can't find the canvas for start recording");
+    if (!this._canvas) throw new Error("Can't find the canvas for start recording");
+    if (!this._canvas.captureStream) throw new Error("Canvas can't support capture Stream");
+
     let stream = this._canvas.captureStream(this._targetFps);
 
     /**
@@ -38,16 +38,18 @@ export default class Recorder {
      * we should check possible codecs
      */
     this._recorder = new MediaRecorder(stream);
-    this._recorder.ondataavailable = e => {
-      if (e.data.size) {
-        this._chunks.push(e.data);
-      }
-    };
+    this._recorder.ondataavailable = this._onDataAvailable.bind(this);
 
     //default for webm
     this._recorder.onstop = this._onMediaRecorderStop.bind(this);
     this._recorder.onstart = this._onMediaRecorderStart.bind(this);
     this._recorder.start();
+  }
+
+  _onDataAvailable(e) {
+    if (e.data.size) {
+      this._chunks.push(e.data);
+    }
   }
 
   _onMediaRecorderStart() {
@@ -75,11 +77,14 @@ export default class Recorder {
   }
 
   get totalRecordedTime() {
-    return this._endRecordingTime - this._initialRecordingTime;
+    return (
+      this._endRecordingTime &&
+      this._endRecordingTime.getTime() - this._initialRecordingTime.getTime()
+    );
   }
 
   get currentRecordingTime() {
-    return new Date() - this._initialRecordingTime;
+    return new Date().getTime() - this._initialRecordingTime.getTime();
   }
 
   get currentRecordingFrames() {
