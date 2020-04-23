@@ -160,7 +160,6 @@
 	    var saveAfterStop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 	    _defineProperty(this, "_isRecording", void 0);
 	    _defineProperty(this, "_targetFps", void 0);
-	    _defineProperty(this, "_initialTime", void 0);
 	    _defineProperty(this, "_endTime", void 0);
 	    _defineProperty(this, "_outputName", void 0);
 	    _defineProperty(this, "_chunks", void 0);
@@ -182,17 +181,19 @@
 	    if (this._isRecording) throw new Error("Stop first before start again");
 	    this._canvas = canvas;
 	    this._outputName = outputName;
-	    if (!this._canvas || !this._canvas.captureStream) throw new Error("Can't find the canvas for start recording");
+	    if (!this._canvas) throw new Error("Can't find the canvas for start recording");
+	    if (!this._canvas.captureStream) throw new Error("Canvas can't support capture Stream");
 	    var stream = this._canvas.captureStream(this._targetFps);
 	    this._recorder = new MediaRecorder(stream);
-	    this._recorder.ondataavailable = e => {
-	      if (e.data.size) {
-	        this._chunks.push(e.data);
-	      }
-	    };
+	    this._recorder.ondataavailable = this._onDataAvailable.bind(this);
 	    this._recorder.onstop = this._onMediaRecorderStop.bind(this);
 	    this._recorder.onstart = this._onMediaRecorderStart.bind(this);
 	    this._recorder.start();
+	  }
+	  _onDataAvailable(e) {
+	    if (e.data.size) {
+	      this._chunks.push(e.data);
+	    }
 	  }
 	  _onMediaRecorderStart() {
 	    this._isRecording = true;
@@ -215,10 +216,10 @@
 	    this._recorder.stop();
 	  }
 	  get totalRecordedTime() {
-	    return this._endRecordingTime - this._initialRecordingTime;
+	    return this._endRecordingTime && this._endRecordingTime.getTime() - this._initialRecordingTime.getTime();
 	  }
 	  get currentRecordingTime() {
-	    return new Date() - this._initialRecordingTime;
+	    return new Date().getTime() - this._initialRecordingTime.getTime();
 	  }
 	  get currentRecordingFrames() {
 	    return this.currentRecordingTime * this._targetFps;
