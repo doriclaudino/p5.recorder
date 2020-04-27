@@ -1,8 +1,8 @@
 /**
  * Copyright p5.recorder
- * v0.0.2
+ * v0.0.3
  * by doriclaudino <dori.claudino@gmail.com>
- * 4/22/2020
+ * 4/27/2020
  */
 
 (function (global, factory) {
