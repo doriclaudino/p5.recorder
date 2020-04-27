@@ -2,7 +2,7 @@
  * Copyright p5.recorder
  * v0.0.2
  * by doriclaudino <dori.claudino@gmail.com>
- * 4/22/2020
+ * 4/27/2020
  */
 
 (function (global, factory) {
@@ -139,6 +139,42 @@
 	}));
 	});
 
+	function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+	  try {
+	    var info = gen[key](arg);
+	    var value = info.value;
+	  } catch (error) {
+	    reject(error);
+	    return;
+	  }
+
+	  if (info.done) {
+	    resolve(value);
+	  } else {
+	    Promise.resolve(value).then(_next, _throw);
+	  }
+	}
+
+	function _asyncToGenerator(fn) {
+	  return function () {
+	    var self = this,
+	        args = arguments;
+	    return new Promise(function (resolve, reject) {
+	      var gen = fn.apply(self, args);
+
+	      function _next(value) {
+	        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+	      }
+
+	      function _throw(err) {
+	        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+	      }
+
+	      _next(undefined);
+	    });
+	  };
+	}
+
 	function _defineProperty(obj, key, value) {
 	  if (key in obj) {
 	    Object.defineProperty(obj, key, {
@@ -154,10 +190,43 @@
 	  return obj;
 	}
 
+	function ownKeys(object, enumerableOnly) {
+	  var keys = Object.keys(object);
+
+	  if (Object.getOwnPropertySymbols) {
+	    var symbols = Object.getOwnPropertySymbols(object);
+	    if (enumerableOnly) symbols = symbols.filter(function (sym) {
+	      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+	    });
+	    keys.push.apply(keys, symbols);
+	  }
+
+	  return keys;
+	}
+
+	function _objectSpread2(target) {
+	  for (var i = 1; i < arguments.length; i++) {
+	    var source = arguments[i] != null ? arguments[i] : {};
+
+	    if (i % 2) {
+	      ownKeys(Object(source), true).forEach(function (key) {
+	        _defineProperty(target, key, source[key]);
+	      });
+	    } else if (Object.getOwnPropertyDescriptors) {
+	      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+	    } else {
+	      ownKeys(Object(source)).forEach(function (key) {
+	        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+	      });
+	    }
+	  }
+
+	  return target;
+	}
+
 	class Recorder {
 	  constructor() {
-	    var output = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "p5.recorder.canvas.webm";
-	    var saveAfterStop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+	    var saveAfterStop = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 	    _defineProperty(this, "_isRecording", void 0);
 	    _defineProperty(this, "_targetFps", void 0);
 	    _defineProperty(this, "_endTime", void 0);
@@ -166,29 +235,81 @@
 	    _defineProperty(this, "_recorder", void 0);
 	    _defineProperty(this, "_saveAfterStop", void 0);
 	    _defineProperty(this, "_canvas", void 0);
+	    _defineProperty(this, "_audioBitRate", void 0);
+	    _defineProperty(this, "_videoBitRate", void 0);
+	    _defineProperty(this, "_recordAudio", void 0);
+	    _defineProperty(this, "_defaultCanvasMimeType", void 0);
+	    _defineProperty(this, "_defaultStartOption", void 0);
 	    this._isRecording = false;
-	    this._targetFps = 60;
-	    this._outputName = output;
 	    this._chunks = [];
 	    this._saveAfterStop = saveAfterStop;
+	    this._defaultCanvasMimeType = "video/webm";
+	    this._defaultStartOption = {
+	      outputName: "p5.recorder.canvas.webm",
+	      recordAudio: true,
+	      audioBitRate: 128000,
+	      videoBitRate: 10000000 * 12,
+	      fps: 60
+	    };
 	  }
 	  get currentBlob() {
 	    return new Blob(this._chunks);
 	  }
 	  start() {
-	    var canvas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document.querySelector("canvas");
-	    var outputName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this._outputName;
-	    if (this._isRecording) throw new Error("Stop first before start again");
-	    this._canvas = canvas;
-	    this._outputName = outputName;
-	    if (!this._canvas) throw new Error("Can't find the canvas for start recording");
-	    if (!this._canvas.captureStream) throw new Error("Canvas can't support capture Stream");
-	    var stream = this._canvas.captureStream(this._targetFps);
-	    this._recorder = new MediaRecorder(stream);
-	    this._recorder.ondataavailable = this._onDataAvailable.bind(this);
+	    var _arguments = arguments,
+	        _this = this;
+	    return _asyncToGenerator(function* () {
+	      var options = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : _this._defaultStartOption;
+	      if (_this._isRecording) throw new Error("Stop first before start again");
+	      var mergeOptions = _objectSpread2({
+	        canvasElement: document.querySelector("canvas")
+	      }, _this._defaultStartOption, {}, options);
+	      _this._canvas = mergeOptions.canvasElement;
+	      _this._outputName = mergeOptions.outputName;
+	      _this._recordAudio = mergeOptions.recordAudio;
+	      _this._audioBitRate = mergeOptions.audioBitRate;
+	      _this._videoBitRate = mergeOptions.videoBitRate;
+	      _this._targetFps = mergeOptions.fps;
+	      if (!_this._canvas) throw new Error("Can't find the canvas for start recording");
+	      if (!_this._canvas.captureStream) throw new Error("Canvas can't support capture Stream");
+	      var streamToRecord = yield _this._resolveStream();
+	      _this._createRecorder(streamToRecord);
+	      _this._recorder.start();
+	    })();
+	  }
+	  get getMediaRecorderOptionsForCanvas() {
+	    return {
+	      audioBitsPerSecond: this._audioBitRate,
+	      videoBitsPerSecond: this._videoBitRate,
+	      mimeType: this._defaultCanvasMimeType
+	    } || {};
+	  }
+	  _resolveStream() {
+	    var _this2 = this;
+	    return _asyncToGenerator(function* () {
+	      var tracks = [];
+	      var videoStream = _this2._canvas.captureStream(_this2._targetFps);
+	      tracks.push(videoStream.getVideoTracks()[0]);
+	      if (_this2._recordAudio) {
+	        var tabStream = yield navigator.mediaDevices.getDisplayMedia({
+	          audio: true,
+	          video: true
+	        });
+	        var audioTracks = tabStream.getAudioTracks();
+	        audioTracks.forEach(track => tracks.push(track));
+	      }
+	      var combinedStream = new MediaStream(tracks);
+	      return combinedStream;
+	    })();
+	  }
+	  _createRecorder(stream) {
+	    this._recorder = new MediaRecorder(stream, this.getMediaRecorderOptionsForCanvas);
 	    this._recorder.onstop = this._onMediaRecorderStop.bind(this);
 	    this._recorder.onstart = this._onMediaRecorderStart.bind(this);
-	    this._recorder.start();
+	    this._recorder.ondataavailable = this._onDataAvailable.bind(this);
+	    this._recorder.onstop = this._onMediaRecorderStop.bind(this);
+	    this._recorder.onerror = e => console.log(e);
+	    return this._recorder;
 	  }
 	  _onDataAvailable(e) {
 	    if (e.data.size) {
