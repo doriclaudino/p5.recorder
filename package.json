@@ -1,6 +1,6 @@
 {
   "name": "p5.recorder",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "record and export p5js canvas as webm, mp4, gif",
   "main": "dist/p5.recorder.js",
   "module": "dist/p5.recorder",
@@ -56,8 +56,9 @@
   "scripts": {
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
-    "build:min": "rollup -c --environment minify",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "prepublishOnly": "yarn build && yarn update:readme",
+    "update:readme": "node ./scripts/update_readme.js"
   }
 }

@@ -1,4 +1,8 @@
-# p5.recorder
+const pkg = require("../package.json");
+const fs = require("fs");
+const endOfLine = require("os").EOL;
+
+let readme = `# p5.recorder
 
 [![NPM](https://nodei.co/npm/p5.recorder.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/p5.recorder/)
 
@@ -10,9 +14,9 @@
 
 ### Install (CDN)
 
-```html
+\`\`\`html
 <!-- option one jsdelivr-->
-<script src="https://cdn.jsdelivr.net/npm/p5.recorder@0.0.5/dist/p5.recorder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5.recorder@${pkg.version}/dist/p5.recorder.js"></script>
 
 <!-- option two githack-->
 <script src="https://raw.githack.com/doriclaudino/p5.recorder/master/dist/p5.recorder.js"></script>
@@ -21,28 +25,28 @@
   option three local source
   downloading from: https://github.com/doriclaudino/p5.recorder/blob/master/dist/p5.recorder.js -->
 <script src="../p5.recorder.js"></script>
-```
+\`\`\`
 
 ### Install (NPM)
 
-```bash
+\`\`\`bash
 npm install p5.drawer
 or
 yarn install p5.drawer
-```
+\`\`\`
 
-Example `using default options`:
-```javascript
+Example \`using default options\`:
+\`\`\`javascript
 let rec = new p5.Recorder();
 rec.start();
 
 //stop after some time
 rec.stop();
-```
+\`\`\`
 
 
-Example `using custom options`:
-```javascript
+Example \`using custom options\`:
+\`\`\`javascript
 let autoDownloadFile = false
 
 //set to no download at the end
@@ -64,7 +68,7 @@ rec.stop();
 
 //download the file after stop
 rec.download();
-```
+\`\`\`
 
 ## enable audio
 Don't forget to __CHECK__ enable audio (we are trying a better approach to capture audio-context on p5js-sound):
@@ -87,3 +91,9 @@ only support .webm for now
 ## for future reference
 
 https://editor.p5js.org/doriclaudino/sketches/LgLw5UaBr
+`;
+
+fs.writeFile("README.md", readme, function (err) {
+  if (err) return console.log(err);
+  console.log("\x1b[42m%s\x1b[40m", `update readme to ${pkg.version}`);
+});
