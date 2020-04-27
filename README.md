@@ -31,27 +31,54 @@ or
 yarn install p5.drawer
 ```
 
-basic example (javascript):
-
+Example `using default options`:
 ```javascript
-//let rec = new p5.Recorder([output = "p5.recorder.canvas.webm"], [saveAtEnd = true]);
-let rec = new p5.Recorder(outputName, saveAtEnd);
+let rec = new p5.Recorder();
 rec.start();
-rec.stop();
 
-//if you set saveAtEnd to false,
-//make sure you call rec.download()
+//stop after some time
+rec.stop();
 ```
 
-basic example (node):
 
+Example `using custom options`:
 ```javascript
-import Recorder from "p5.recorder";
-let rec = new Recorder();
-rec.start();
+let autoDownloadFile = false
+
+//set to no download at the end
+let rec = new p5.Recorder(autoDownloadFile);
+
+let options = {
+  outputName: "my_custom_name_output.webm",
+  recordAudio: true,
+  audioBitRate: 128000,
+  videoBitRate: ‭100000000‬ , //10 megabits
+  fps: 45,
+}
+
+//passing custom configs
+rec.start(options);
+
+//stop after some time
 rec.stop();
-//rec.download();
+
+//download the file after stop
+rec.download();
 ```
+
+## enable audio
+Don't forget to __CHECK__ enable audio (we are trying a better approach to capture audio-context on p5js-sound):
+
+![Image description](https://i.imgur.com/LVgEuzA.png)
+
+
+
+
+## commands
+- yarn dev
+- yarn build
+
+
 
 ## still in development
 
