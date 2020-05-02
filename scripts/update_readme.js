@@ -76,8 +76,10 @@ rec.download();
 
 
 </br> 
-##default options start method:
-| **name** | **value** |
+
+## default options start() method:
+
+| **name** | **value**  |
 | --- | --- |
 | filename | "p5.recorder.canvas.webm" |
 | recordAudio | true |
