@@ -1,6 +1,6 @@
 /**
  * Copyright p5.recorder
- * v0.0.5
+ * v0.0.6
  * by doriclaudino <dori.claudino@gmail.com>
  * 5/2/2020
  */
@@ -356,7 +356,7 @@
 	  get status() {
 	    var _classPrivateFieldGet2;
 	    return {
-	      state: ((_classPrivateFieldGet2 = _classPrivateFieldGet(this, _recorder)) === null || _classPrivateFieldGet2 === void 0 ? void 0 : _classPrivateFieldGet2.state) || "inactive",
+	      state: (_classPrivateFieldGet2 = _classPrivateFieldGet(this, _recorder)) === null || _classPrivateFieldGet2 === void 0 ? void 0 : _classPrivateFieldGet2.state,
 	      time: _classPrivateFieldGet(this, _webMRecordedTime),
 	      frames: _classPrivateFieldGet(this, _webMtotalRecordedFrames),
 	      progress: _classPrivateFieldGet(this, _progress)

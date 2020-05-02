@@ -1,6 +1,6 @@
 {
   "name": "p5.recorder",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "record and export p5js canvas as webm, mp4, gif",
   "main": "dist/p5.recorder.js",
   "module": "dist/p5.recorder",

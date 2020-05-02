@@ -12,7 +12,7 @@
 
 ```html
 <!--jsdelivr-->
-<script src="https://cdn.jsdelivr.net/npm/p5.recorder@0.0.5/dist/p5.recorder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5.recorder@0.0.6/dist/p5.recorder.js"></script>
 ```
 
 ### Install (NPM)
@@ -41,7 +41,7 @@ let autoDownloadFile = false
 let rec = new p5.Recorder(autoDownloadFile);
 
 let options = {
-  outputName: "my_custom_name_output.webm",
+  filename: "my_custom_name_output.webm",
   recordAudio: true,
   audioBitRate: 128000,
   videoBitRate: ‭100000000‬ , //10 megabits
@@ -54,9 +54,33 @@ rec.start(options);
 //stop after some time
 rec.stop();
 
+/**
+ * contains current status
+ * status: {
+ *   frames: 0,
+ *   progress: 0,
+ *   state: undefined,
+ *   time: undefined,
+ * }
+ */
+rec.status;
+
+
 //download the file after stop
 rec.download();
 ```
+
+
+</br> 
+##default options start method:
+| **name** | **value** |
+| --- | --- |
+| filename | "p5.recorder.canvas.webm" |
+| recordAudio | true |
+| audioBitRate | 128000 |
+| videoBitRate | 120000000 |
+| fps | 60 |
+
 
 ## enable audio
 Don't forget to __CHECK__ enable audio (we are trying a better approach to capture audio-context on p5js-sound):
@@ -66,7 +90,7 @@ Don't forget to __CHECK__ enable audio (we are trying a better approach to captu
 
 
 
-##commands
+## commands
 - yarn dev
 - yarn build
 

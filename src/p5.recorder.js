@@ -65,7 +65,10 @@ export default class Recorder {
     if (recordAudio) {
       //seems we can record using the same stream after user click for stop sharing.
       if (!this.#audioStreamTab || !this.#audioStreamTab.active)
-        this.#audioStreamTab = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: true });
+        this.#audioStreamTab = await navigator.mediaDevices.getDisplayMedia({
+          audio: true,
+          video: true,
+        });
       let audioTracks = this.#audioStreamTab.getAudioTracks();
       audioTracks.forEach((track) => tracks.push(track));
     }
@@ -131,10 +134,18 @@ export default class Recorder {
   /**
    * we can play with transcoding state, mixing mediaRecoder + transcoding when user ask for transcoding
    * makes more sense use the progress to transcoding only
+   *
+   * contains current status
+   * status: {
+   *   frames: 0,
+   *   progress: 0,
+   *   state: undefined,
+   *   time: undefined,
+   * }
    */
   get status() {
     return {
-      state: this.#recorder?.state || "inactive",
+      state: this.#recorder?.state,
       time: this.#webMRecordedTime,
       frames: this.#webMtotalRecordedFrames,
       progress: this.#progress,

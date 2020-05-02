@@ -15,16 +15,8 @@ let readme = `# p5.recorder
 ### Install (CDN)
 
 \`\`\`html
-<!-- option one jsdelivr-->
+<!--jsdelivr-->
 <script src="https://cdn.jsdelivr.net/npm/p5.recorder@${pkg.version}/dist/p5.recorder.js"></script>
-
-<!-- option two githack-->
-<script src="https://raw.githack.com/doriclaudino/p5.recorder/master/dist/p5.recorder.js"></script>
-
-<!--
-  option three local source
-  downloading from: https://github.com/doriclaudino/p5.recorder/blob/master/dist/p5.recorder.js -->
-<script src="../p5.recorder.js"></script>
 \`\`\`
 
 ### Install (NPM)
@@ -53,7 +45,7 @@ let autoDownloadFile = false
 let rec = new p5.Recorder(autoDownloadFile);
 
 let options = {
-  outputName: "my_custom_name_output.webm",
+  filename: "my_custom_name_output.webm",
   recordAudio: true,
   audioBitRate: 128000,
   videoBitRate: ‭100000000‬ , //10 megabits
@@ -66,9 +58,33 @@ rec.start(options);
 //stop after some time
 rec.stop();
 
+/**
+ * contains current status
+ * status: {
+ *   frames: 0,
+ *   progress: 0,
+ *   state: undefined,
+ *   time: undefined,
+ * }
+ */
+rec.status;
+
+
 //download the file after stop
 rec.download();
 \`\`\`
+
+
+</br> 
+##default options start method:
+| **name** | **value** |
+| --- | --- |
+| filename | "p5.recorder.canvas.webm" |
+| recordAudio | true |
+| audioBitRate | 128000 |
+| videoBitRate | 120000000 |
+| fps | 60 |
+
 
 ## enable audio
 Don't forget to __CHECK__ enable audio (we are trying a better approach to capture audio-context on p5js-sound):
@@ -97,3 +113,4 @@ fs.writeFile("README.md", readme, function (err) {
   if (err) return console.log(err);
   console.log("\x1b[42m%s\x1b[40m", `update readme to ${pkg.version}`);
 });
+
