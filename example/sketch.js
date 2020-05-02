@@ -1,15 +1,40 @@
-const s = (sketch) => {
-  let x = 100;
-  let y = 100;
+const s = (s) => {
+  let soundFile, fft, filter, filterFreq, filterRes;
 
-  sketch.setup = () => {
-    sketch.createCanvas(200, 200);
+  s.preload = () => {
+    soundFile = s.loadSound("./beat.mp3");
   };
 
-  sketch.draw = () => {
-    sketch.background(0);
-    sketch.fill(255);
-    sketch.rect(sketch.random(x), sketch.random(y), 50, 50);
+  s.setup = () => {
+    s.createCanvas(710, 256);
+    s.fill(255, 40, 255);
+    soundFile.loop();
+
+    filter = new p5.LowPass();
+
+    soundFile.disconnect();
+    soundFile.connect(filter);
+
+    fft = new p5.FFT();
+    s.userStartAudio();
+  };
+
+  s.draw = () => {
+    s.background(30);
+
+    filterFreq = s.map(s.mouseX, 0, s.width, 10, 22050);
+    filterRes = s.map(s.mouseY, 0, s.height, 15, 5);
+    filter.set(filterFreq, filterRes);
+
+    var spectrum = fft.analyze();
+
+    s.noStroke();
+
+    for (var i = 0; i < spectrum.length; i++) {
+      var x = s.map(i, 0, spectrum.length, 0, s.width);
+      var h = -s.height + s.map(spectrum[i], 0, 255, s.height, 0);
+      s.rect(x, s.height, s.width / spectrum.length, h);
+    }
   };
 };
 

@@ -1,96 +1,132 @@
-const _download = require("downloadjs");
+const downloadjs = require("downloadjs");
 
 export default class Recorder {
-  #_targetFps;
-  #_outputName;
-  #_chunks;
-  #_recorder;
-  #_saveAfterStop;
-  #_canvas;
-  #_progress;
-  #_timer;
+  #chunks = [];
+  #recorder;
+  #saveAfterStop = true;
+  #canvas;
+  #defaultRecordingOptions = {
+    filename: "p5.recorder.canvas.webm",
+    recordAudio: true,
+    audioBitRate: 128000,
+    videoBitRate: 120000000,
+    fps: 60,
+  };
+  #currentRecordingOptions = {
+    filename,
+    recordAudio,
+    audioBitRate,
+    videoBitRate,
+    fps,
+    mimeType,
+  };
+  #timer = {
+    start,
+    end,
+  };
+  #progress;
 
-  constructor(output = "p5.recorder.canvas.webm", saveAfterStop = true) {
-    this.#_targetFps = 60;
-    this.#_outputName = output;
-    this.#_chunks = [];
-    this.#_saveAfterStop = saveAfterStop;
-    this.#_timer = {};
+  constructor(saveAfterStop = true) {
+    this.#saveAfterStop = saveAfterStop;
   }
 
-  //doriclaudino
   get #currentBlob() {
-    return new Blob(this.#_chunks);
+    return new Blob(this.#chunks);
   }
 
   get #isRecording() {
-    return this.#_recorder && this.#_recorder.state === "recording";
+    return this.#recorder && this.#recorder.state && this.#recorder.state !== "recording";
   }
 
-  get #isPaused() {
-    return this.#_recorder && this.#_recorder.state === "paused";
+  async start(options) {
+    if (this.#isRecording) throw new Error("Stop first before start again");
+
+    this.#mergeUserOptions(options);
+    this.#createRecorder(await this.#resolveStream());
   }
 
-  start(canvas = document.querySelector("canvas"), outputName = this.#_outputName, extras = {}) {
-    if (this.#isRecording || this.#isPaused) throw new Error("Stop first before start again");
-    this.#_canvas = canvas;
-    this.#_outputName = outputName;
+  #mergeUserOptions(userOptions) {
+    this.#currentRecordingOptions = {
+      canvasElement: document.querySelector("canvas"),
+      ...this.#defaultRecordingOptions,
+      ...userOptions,
+      mimeType: "video/webm",
+    };
+  }
 
-    if (!this.#_canvas) throw new Error("Can't find the canvas for start recording");
-    if (!this.#_canvas.captureStream) throw new Error("Canvas can't support capture Stream");
+  async #resolveStream() {
+    let tracks = [];
 
-    let stream = this.#_canvas.captureStream(this.#_targetFps);
+    //video track from canvas stream
+    let videoStream = this.#canvas.captureStream(this.#currentRecordingOptions.fps);
+    tracks.push(videoStream.getVideoTracks()[0]);
 
     /**
-     * https://developers.google.com/web/updates/2016/01/mediarecorder
-     * we should check possible codecs
+     * tracking here https://github.com/processing/p5.js-sound/issues/457
+     * the possibility to not use navigator.mediaDevices.getDisplayMedia API
      */
-    this.#_recorder = new MediaRecorder(stream);
-    this.#_recorder.ondataavailable = this.#_onDataAvailable.bind(this);
+    if (this.#currentRecordingOptions.recordAudio) {
+      let tabStream = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: true });
+      let audioTracks = tabStream.getAudioTracks();
+      audioTracks.forEach((track) => tracks.push(track));
+    }
 
-    //default for webm
-    this.#_recorder.onstop = this.#_onMediaRecorderStop.bind(this);
-    this.#_recorder.onstart = this.#_onMediaRecorderStart.bind(this);
-    this.#_recorder.start();
+    //combine video and audiotracks
+    let combinedStream = new MediaStream(tracks);
+    return combinedStream;
   }
 
-  #_onDataAvailable(e) {
+  #createRecorder(stream) {
+    this.#recorder = new MediaRecorder(stream, this.currentRecordingOptions);
+    this.#recorder.onstop = this.#onMediaRecorderStop.bind(this);
+    this.#recorder.onstart = this.#onMediaRecorderStart.bind(this);
+    this.#recorder.ondataavailable = this.#onDataAvailable.bind(this);
+    this.#recorder.onstop = this.#onMediaRecorderStop.bind(this);
+    this.#recorder.onerror = (e) => console.log(e);
+    return this.#recorder;
+  }
+
+  #onDataAvailable(e) {
     if (e.data.size) {
-      this.#_chunks.push(e.data);
+      this.#chunks.push(e.data);
     }
   }
 
-  #_onMediaRecorderStart() {
-    this.#_timer = {
+  #onMediaRecorderStart() {
+    this.#timer = {
       start: new Date(),
       end: undefined,
     };
-    this.#_progress = 0;
-    this.#_chunks = [];
-    this.#_chunks.length = 0;
+    this.#progress = 0;
+    this.#chunks = [];
+    this.#chunks.length = 0;
   }
 
-  #_onMediaRecorderStop() {
-    this.#_timer.end = new Date();
-    this.#_progress = 100;
-    if (this.#_saveAfterStop) this.download();
+  #onMediaRecorderStop() {
+    this.#timer.end = new Date();
+    this.#progress = 100;
+    if (this.#saveAfterStop) this.download();
   }
 
   download() {
-    _download(this.#currentBlob, this.#_outputName, "video/webm");
+    downloadjs(
+      this.#currentBlob,
+      this.#currentRecordingOptions.filename,
+      this.#currentRecordingOptions.mimeType
+    );
   }
 
   stop() {
-    this.#_recorder.stop();
+    this.#recorder.stop();
   }
 
   get #webMRecordedTime() {
-    let date = this.#_timer.end ? this.#_timer.end.getTime() : new Date().getTime();
-    return date - this.#_timer.start.getTime();
+    let date = this.#timer.end ? this.#timer.end.getTime() : new Date().getTime();
+    return date - this.#timer.start.getTime();
   }
 
   get #webMtotalRecordedFrames() {
-    return (this.#webMRecordedTime * this.#_targetFps) / 1000;
+    return (this.#webMRecordedTime * this.#currentRecordingOptions.fps) / 1000;
   }
 
   /**
@@ -99,10 +135,10 @@ export default class Recorder {
    */
   get status() {
     return {
-      state: this.#_recorder.state,
+      state: this.#recorder.state,
       time: this.#webMRecordedTime,
       frames: this.#webMtotalRecordedFrames,
-      progress: this.#_progress,
+      progress: this.#progress,
     };
   }
 }

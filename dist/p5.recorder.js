@@ -139,29 +139,50 @@
 	}));
 	});
 
-	function _classPrivateFieldGet(receiver, privateMap) {
-	  var descriptor = privateMap.get(receiver);
-
-	  if (!descriptor) {
-	    throw new TypeError("attempted to get private field on non-instance");
+	function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+	  try {
+	    var info = gen[key](arg);
+	    var value = info.value;
+	  } catch (error) {
+	    reject(error);
+	    return;
 	  }
 
-	  if (descriptor.get) {
-	    return descriptor.get.call(receiver);
+	  if (info.done) {
+	    resolve(value);
+	  } else {
+	    Promise.resolve(value).then(_next, _throw);
 	  }
-
-	  return descriptor.value;
 	}
 
-	function _classPrivateFieldSet(receiver, privateMap, value) {
-	  var descriptor = privateMap.get(receiver);
+	function _asyncToGenerator(fn) {
+	  return function () {
+	    var self = this,
+	        args = arguments;
+	    return new Promise(function (resolve, reject) {
+	      var gen = fn.apply(self, args);
 
-	  if (!descriptor) {
-	    throw new TypeError("attempted to set private field on non-instance");
-	  }
+	      function _next(value) {
+	        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+	      }
 
-	  if (descriptor.set) {
-	    descriptor.set.call(receiver, value);
+	      function _throw(err) {
+	        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+	      }
+
+	      _next(undefined);
+	    });
+	  };
+	}
+
+	function _defineProperty(obj, key, value) {
+	  if (key in obj) {
+	    Object.defineProperty(obj, key, {
+	      value: value,
+	      enumerable: true,
+	      configurable: true,
+	      writable: true
+	    });
 	  } else {
 	    if (!descriptor.writable) {
 	      throw new TypeError("attempted to set read only private field");
@@ -181,85 +202,145 @@
 	  return fn;
 	}
 
+	function ownKeys(object, enumerableOnly) {
+	  var keys = Object.keys(object);
+
+	  if (Object.getOwnPropertySymbols) {
+	    var symbols = Object.getOwnPropertySymbols(object);
+	    if (enumerableOnly) symbols = symbols.filter(function (sym) {
+	      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+	    });
+	    keys.push.apply(keys, symbols);
+	  }
+
+	  return keys;
+	}
+
+	function _objectSpread2(target) {
+	  for (var i = 1; i < arguments.length; i++) {
+	    var source = arguments[i] != null ? arguments[i] : {};
+
+	    if (i % 2) {
+	      ownKeys(Object(source), true).forEach(function (key) {
+	        _defineProperty(target, key, source[key]);
+	      });
+	    } else if (Object.getOwnPropertyDescriptors) {
+	      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+	    } else {
+	      ownKeys(Object(source)).forEach(function (key) {
+	        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+	      });
+	    }
+	  }
+
+	  return target;
+	}
+
 	class Recorder {
 	  constructor() {
-	    var output = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "p5.recorder.canvas.webm";
-	    var saveAfterStop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-	    _webMtotalRecordedFrames.set(this, {
-	      get: _get_webMtotalRecordedFrames,
-	      set: void 0
-	    });
-	    _webMRecordedTime.set(this, {
-	      get: _get_webMRecordedTime,
-	      set: void 0
-	    });
-	    _onMediaRecorderStop.add(this);
-	    _onMediaRecorderStart.add(this);
-	    _onDataAvailable.add(this);
-	    _isPaused.set(this, {
-	      get: _get_isPaused,
-	      set: void 0
-	    });
-	    _isRecording.set(this, {
-	      get: _get_isRecording,
-	      set: void 0
-	    });
-	    _currentBlob.set(this, {
-	      get: _get_currentBlob,
-	      set: void 0
-	    });
-	    _targetFps.set(this, {
-	      writable: true,
-	      value: void 0
-	    });
-	    _outputName.set(this, {
-	      writable: true,
-	      value: void 0
-	    });
-	    _chunks.set(this, {
-	      writable: true,
-	      value: void 0
-	    });
-	    _recorder.set(this, {
-	      writable: true,
-	      value: void 0
-	    });
-	    _saveAfterStop.set(this, {
-	      writable: true,
-	      value: void 0
-	    });
-	    _canvas.set(this, {
-	      writable: true,
-	      value: void 0
-	    });
-	    _progress.set(this, {
-	      writable: true,
-	      value: void 0
-	    });
-	    _timer.set(this, {
-	      writable: true,
-	      value: void 0
-	    });
-	    _classPrivateFieldSet(this, _targetFps, 60);
-	    _classPrivateFieldSet(this, _outputName, output);
-	    _classPrivateFieldSet(this, _chunks, []);
-	    _classPrivateFieldSet(this, _saveAfterStop, saveAfterStop);
-	    _classPrivateFieldSet(this, _timer, {});
+	    var saveAfterStop = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+	    _defineProperty(this, "_isRecording", void 0);
+	    _defineProperty(this, "_targetFps", void 0);
+	    _defineProperty(this, "_endTime", void 0);
+	    _defineProperty(this, "_outputName", void 0);
+	    _defineProperty(this, "_chunks", void 0);
+	    _defineProperty(this, "_recorder", void 0);
+	    _defineProperty(this, "_saveAfterStop", void 0);
+	    _defineProperty(this, "_canvas", void 0);
+	    _defineProperty(this, "_audioBitRate", void 0);
+	    _defineProperty(this, "_videoBitRate", void 0);
+	    _defineProperty(this, "_recordAudio", void 0);
+	    _defineProperty(this, "_defaultCanvasMimeType", void 0);
+	    _defineProperty(this, "_defaultStartOption", void 0);
+	    this._isRecording = false;
+	    this._chunks = [];
+	    this._saveAfterStop = saveAfterStop;
+	    this._defaultCanvasMimeType = "video/webm";
+	    this._defaultStartOption = {
+	      outputName: "p5.recorder.canvas.webm",
+	      recordAudio: true,
+	      audioBitRate: 128000,
+	      videoBitRate: 10000000 * 12,
+	      fps: 60
+	    };
+	  }
+	  get currentBlob() {
+	    return new Blob(this._chunks);
 	  }
 	  start() {
-	    var canvas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document.querySelector("canvas");
-	    var outputName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _classPrivateFieldGet(this, _outputName);
-	    if (_classPrivateFieldGet(this, _isRecording) || _classPrivateFieldGet(this, _isPaused)) throw new Error("Stop first before start again");
-	    _classPrivateFieldSet(this, _canvas, canvas);
-	    _classPrivateFieldSet(this, _outputName, outputName);
-	    if (!_classPrivateFieldGet(this, _canvas)) throw new Error("Can't find the canvas for start recording");
-	    if (!_classPrivateFieldGet(this, _canvas).captureStream) throw new Error("Canvas can't support capture Stream");
-	    var stream = _classPrivateFieldGet(this, _canvas).captureStream(_classPrivateFieldGet(this, _targetFps));
-	    _classPrivateFieldSet(this, _recorder, new MediaRecorder(stream));
-	    _classPrivateFieldGet(this, _recorder).ondataavailable = _classPrivateMethodGet(this, _onDataAvailable, _onDataAvailable2).bind(this);
-	    _classPrivateFieldGet(this, _recorder).onstop = _classPrivateMethodGet(this, _onMediaRecorderStop, _onMediaRecorderStop2).bind(this);
-	    _classPrivateFieldGet(this, _recorder).onstart = _classPrivateMethodGet(this, _onMediaRecorderStart, _onMediaRecorderStart2).bind(this);
-	    _classPrivateFieldGet(this, _recorder).start();
+	    var _arguments = arguments,
+	        _this = this;
+	    return _asyncToGenerator(function* () {
+	      var options = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : _this._defaultStartOption;
+	      if (_this._isRecording) throw new Error("Stop first before start again");
+	      var mergeOptions = _objectSpread2({
+	        canvasElement: document.querySelector("canvas")
+	      }, _this._defaultStartOption, {}, options);
+	      _this._canvas = mergeOptions.canvasElement;
+	      _this._outputName = mergeOptions.outputName;
+	      _this._recordAudio = mergeOptions.recordAudio;
+	      _this._audioBitRate = mergeOptions.audioBitRate;
+	      _this._videoBitRate = mergeOptions.videoBitRate;
+	      _this._targetFps = mergeOptions.fps;
+	      if (!_this._canvas) throw new Error("Can't find the canvas for start recording");
+	      if (!_this._canvas.captureStream) throw new Error("Canvas can't support capture Stream");
+	      var streamToRecord = yield _this._resolveStream();
+	      _this._createRecorder(streamToRecord);
+	      _this._recorder.start();
+	    })();
+	  }
+	  get getMediaRecorderOptionsForCanvas() {
+	    return {
+	      audioBitsPerSecond: this._audioBitRate,
+	      videoBitsPerSecond: this._videoBitRate,
+	      mimeType: this._defaultCanvasMimeType
+	    } || {};
+	  }
+	  _resolveStream() {
+	    var _this2 = this;
+	    return _asyncToGenerator(function* () {
+	      var tracks = [];
+	      var videoStream = _this2._canvas.captureStream(_this2._targetFps);
+	      tracks.push(videoStream.getVideoTracks()[0]);
+	      if (_this2._recordAudio) {
+	        var tabStream = yield navigator.mediaDevices.getDisplayMedia({
+	          audio: true,
+	          video: true
+	        });
+	        var audioTracks = tabStream.getAudioTracks();
+	        audioTracks.forEach(track => tracks.push(track));
+	      }
+	      var combinedStream = new MediaStream(tracks);
+	      return combinedStream;
+	    })();
+	  }
+	  _createRecorder(stream) {
+	    this._recorder = new MediaRecorder(stream, this.getMediaRecorderOptionsForCanvas);
+	    this._recorder.onstop = this._onMediaRecorderStop.bind(this);
+	    this._recorder.onstart = this._onMediaRecorderStart.bind(this);
+	    this._recorder.ondataavailable = this._onDataAvailable.bind(this);
+	    this._recorder.onstop = this._onMediaRecorderStop.bind(this);
+	    this._recorder.onerror = e => console.log(e);
+	    return this._recorder;
+	  }
+	  _onDataAvailable(e) {
+	    if (e.data.size) {
+	      this._chunks.push(e.data);
+	    }
+	  }
+	  _onMediaRecorderStart() {
+	    this._isRecording = true;
+	    this._initialRecordingTime = new Date();
+	    this._endRecordingTime = undefined;
+	    this._progress = 0;
+	    this._chunks = [];
+	    this._chunks.length = 0;
+	  }
+	  _onMediaRecorderStop() {
+	    this._isRecording = false;
+	    this._endRecordingTime = new Date();
+	    this._progress = 100;
+	    if (this._saveAfterStop) this.download();
 	  }
 	  download() {
 	    download(_classPrivateFieldGet(this, _currentBlob), _classPrivateFieldGet(this, _outputName), "video/webm");

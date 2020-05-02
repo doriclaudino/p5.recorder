@@ -7,6 +7,9 @@
     <script src="../dist/p5.recorder.js"></script>
   </head>
   <body>
+    <button id="start" onclick="rec.start({recordAudio: document.getElementById('ckRecAudio').checked})">start</button>
+    <button id="stop" onclick="rec.stop()">stop</button>
+    <input type="checkbox" id="ckRecAudio" checked="function(){return rec._recordAudio}">
     <script src="sketch.js"></script>
   </body>
 </html>

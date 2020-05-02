@@ -33,8 +33,8 @@ let dev = {
       exclude: "node_modules/**",
     }),
     resolve(), // so Rollup can find `ms`
-    commonjs(), // so Rollup can convert `ms` to an ES module,
-    cleanup() //clean unused comments
+    commonjs(), // so Rollup can convert `ms` to an ES module,  
+    cleanup(),
   ],
 };
 
