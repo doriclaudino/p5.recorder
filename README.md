@@ -12,7 +12,7 @@
 
 ```html
 <!--jsdelivr-->
-<script src="https://cdn.jsdelivr.net/npm/p5.recorder@0.0.6/dist/p5.recorder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5.recorder@0.0.7/dist/p5.recorder.js"></script>
 ```
 
 ### Install (NPM)
