@@ -41,5 +41,3 @@ const s = (s) => {
 const myp5 = new p5(s);
 rec = new p5.Recorder();
 console.log(rec);
-setTimeout(() => rec.start(), 1000);
-setTimeout(() => rec.stop(), 5000);

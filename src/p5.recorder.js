@@ -4,7 +4,7 @@ export default class Recorder {
   #chunks = [];
   #recorder;
   #saveAfterStop = true;
-  #canvas;
+  #audioStreamTab;
   #defaultRecordingOptions = {
     filename: "p5.recorder.canvas.webm",
     recordAudio: true,
@@ -13,18 +13,19 @@ export default class Recorder {
     fps: 60,
   };
   #currentRecordingOptions = {
-    filename,
-    recordAudio,
-    audioBitRate,
-    videoBitRate,
-    fps,
-    mimeType,
+    canvas: undefined,
+    filename: undefined,
+    recordAudio: undefined,
+    audioBitRate: undefined,
+    videoBitRate: undefined,
+    fps: undefined,
+    mimeType: undefined,
   };
   #timer = {
-    start,
-    end,
+    start: undefined,
+    end: undefined,
   };
-  #progress;
+  #progress = 0;
 
   constructor(saveAfterStop = true) {
     this.#saveAfterStop = saveAfterStop;
@@ -34,20 +35,16 @@ export default class Recorder {
     return new Blob(this.#chunks);
   }
 
-  get #isRecording() {
-    return this.#recorder && this.#recorder.state && this.#recorder.state !== "recording";
-  }
-
   async start(options) {
-    if (this.#isRecording) throw new Error("Stop first before start again");
-
     this.#mergeUserOptions(options);
-    this.#createRecorder(await this.#resolveStream());
+    let stream = await this.#resolveStream();
+    this.#createRecorder(stream);
+    this.#recorder.start();
   }
 
   #mergeUserOptions(userOptions) {
     this.#currentRecordingOptions = {
-      canvasElement: document.querySelector("canvas"),
+      canvas: document.querySelector("canvas"),
       ...this.#defaultRecordingOptions,
       ...userOptions,
       mimeType: "video/webm",
@@ -56,18 +53,20 @@ export default class Recorder {
 
   async #resolveStream() {
     let tracks = [];
-
+    const { canvas, fps, recordAudio } = this.#currentRecordingOptions;
     //video track from canvas stream
-    let videoStream = this.#canvas.captureStream(this.#currentRecordingOptions.fps);
+    let videoStream = canvas.captureStream(fps);
     tracks.push(videoStream.getVideoTracks()[0]);
 
     /**
      * tracking here https://github.com/processing/p5.js-sound/issues/457
      * the possibility to not use navigator.mediaDevices.getDisplayMedia API
      */
-    if (this.#currentRecordingOptions.recordAudio) {
-      let tabStream = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: true });
-      let audioTracks = tabStream.getAudioTracks();
+    if (recordAudio) {
+      //seems we can record using the same stream after user click for stop sharing.
+      if (!this.#audioStreamTab || !this.#audioStreamTab.active)
+        this.#audioStreamTab = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: true });
+      let audioTracks = this.#audioStreamTab.getAudioTracks();
       audioTracks.forEach((track) => tracks.push(track));
     }
 
@@ -121,12 +120,12 @@ export default class Recorder {
   }
 
   get #webMRecordedTime() {
-    let date = this.#timer.end ? this.#timer.end.getTime() : new Date().getTime();
-    return date - this.#timer.start.getTime();
+    let date = this.#timer?.end?.getTime() || new Date().getTime();
+    return date - this.#timer?.start?.getTime() || undefined;
   }
 
   get #webMtotalRecordedFrames() {
-    return (this.#webMRecordedTime * this.#currentRecordingOptions.fps) / 1000;
+    return (this.#webMRecordedTime * this.#currentRecordingOptions.fps) / 1000 || 0;
   }
 
   /**
@@ -135,7 +134,7 @@ export default class Recorder {
    */
   get status() {
     return {
-      state: this.#recorder.state,
+      state: this.#recorder?.state || "inactive",
       time: this.#webMRecordedTime,
       frames: this.#webMtotalRecordedFrames,
       progress: this.#progress,
