@@ -11,16 +11,8 @@
 ### Install (CDN)
 
 ```html
-<!-- option one jsdelivr-->
+<!--jsdelivr-->
 <script src="https://cdn.jsdelivr.net/npm/p5.recorder@0.0.5/dist/p5.recorder.js"></script>
-
-<!-- option two githack-->
-<script src="https://raw.githack.com/doriclaudino/p5.recorder/master/dist/p5.recorder.js"></script>
-
-<!--
-  option three local source
-  downloading from: https://github.com/doriclaudino/p5.recorder/blob/master/dist/p5.recorder.js -->
-<script src="../p5.recorder.js"></script>
 ```
 
 ### Install (NPM)
