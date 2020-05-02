@@ -31,12 +31,13 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-private-methods": "^7.8.3",
     "@babel/preset-env": "^7.9.5",
     "@ffmpeg/ffmpeg": "^0.7.0",
     "@rollup/plugin-commonjs": "^11.1.0",
     "@rollup/plugin-node-resolve": "^7.1.3",
     "@types/jest": "^25.2.1",
-    "babel-eslint": "^10.1.0",
+    "babel-eslint": "^11.0.0-beta.0",
     "babel-jest": "^25.4.0",
     "canvas": "^2.6.1",
     "downloadjs": "^1.4.7",
@@ -46,6 +47,7 @@
     "jest-canvas-mock": "^2.2.0",
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "jsdom": "^16.2.2",
+    "live-server": "^1.2.1",
     "p5": "^1.0.0",
     "rollup": "^2.7.1",
     "rollup-plugin-babel": "^4.4.0",
@@ -59,6 +61,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "prepublishOnly": "yarn build && yarn update:readme",
-    "update:readme": "node ./scripts/update_readme.js"
+    "update:readme": "node ./scripts/update_readme.js",
+    "dev": "live-server . --open=example --ignore=src,scripts,node_modules,test,coverage --cors"
   }
 }
