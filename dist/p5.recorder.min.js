@@ -1,6 +1,6 @@
 /**
  * Copyright p5.recorder
- * v0.0.6
+ * v0.0.7
  * by doriclaudino <dori.claudino@gmail.com>
  * 5/2/2020
  */
