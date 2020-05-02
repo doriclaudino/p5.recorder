@@ -76,7 +76,7 @@ export default class Recorder {
     if (this.#_saveAfterStop) this.download();
   }
 
-  download() {    
+  download() {
     _download(this.#currentBlob, this.#_outputName, "video/webm");
   }
 
@@ -85,10 +85,24 @@ export default class Recorder {
   }
 
   get #webMRecordedTime() {
-    return this.#_timer.end.getTime() - this.#_timer.start.getTime();
+    let date = this.#_timer.end ? this.#_timer.end.getTime() : new Date().getTime();
+    return date - this.#_timer.start.getTime();
   }
 
   get #webMtotalRecordedFrames() {
     return (this.#webMRecordedTime * this.#_targetFps) / 1000;
+  }
+
+  /**
+   * we can play with transcoding state, mixing mediaRecoder + transcoding when user ask for transcoding
+   * makes more sense use the progress to transcoding only
+   */
+  get status() {
+    return {
+      state: this.#_recorder.state,
+      time: this.#webMRecordedTime,
+      frames: this.#webMtotalRecordedFrames,
+      progress: this.#_progress,
+    };
   }
 }
