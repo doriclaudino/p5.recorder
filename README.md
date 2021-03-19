@@ -18,9 +18,9 @@
 ### Install (NPM)
 
 ```bash
-npm install p5.drawer
+npm install p5.recorder
 or
-yarn install p5.drawer
+yarn install p5.recorder
 ```
 
 Example `using default options`:
